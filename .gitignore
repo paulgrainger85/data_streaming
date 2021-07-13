@@ -1,3 +1,5 @@
 *.zip
-videos/*
-__MACOSX/*
+videos/
+__MACOSX/
+venv/
+.vscode/
