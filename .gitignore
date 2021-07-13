@@ -1,5 +1,6 @@
 *.zip
 videos/
-__MACOSX/
 venv/
 .vscode/
+__MACOSX/
+__pycache__/
