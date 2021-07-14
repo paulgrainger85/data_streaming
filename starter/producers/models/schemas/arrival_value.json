@@ -3,7 +3,7 @@
   "name": "arrival_event",
   "type": "record",
   "fields": [
-    {"name": "station_id", "type": "string"},
+    {"name": "station_id", "type": "int"},
     {"name": "train_id", "type": "int"},
     {"name": "direction", "type": "string"},
     {"name": "line", "type": "string"},
