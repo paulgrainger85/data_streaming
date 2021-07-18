@@ -33,16 +33,16 @@ class TransformedStation(faust.Record):
 #   places it into a new topic with only the necessary information.
 app = faust.App("stations-stream", broker="kafka://localhost:9092", store="memory://")
 # TODO: Define the input Kafka Topic. Hint: What topic did Kafka Connect output to?
-# topic = app.topic("TODO", value_type=Station)
+topic = app.topic("stations-todo", value_type=Station)
 # TODO: Define the output Kafka Topic
-# out_topic = app.topic("TODO", partitions=1)
+out_topic = app.topic("stations-transformed", partitions=1)
 # TODO: Define a Faust Table
-#table = app.Table(
-#    # "TODO",
-#    # default=TODO,
-#    partitions=1,
-#    changelog_topic=out_topic,
-#)
+table = app.Table(
+   "transformed_station",
+   default=int,
+   partitions=1,
+   changelog_topic=out_topic,
+)
 
 
 #
@@ -52,6 +52,16 @@ app = faust.App("stations-stream", broker="kafka://localhost:9092", store="memor
 # then you would set the `line` of the `TransformedStation` record to the string `"red"`
 #
 #
+@app.agent(topic)
+async def station_callback(station):
+    async for ce in station.group_by(ClickEvent.uri):
+        #
+        # TODO: Use the URI as key, and add the number for each click event
+        #
+        uri_summary_table[ce.uri] += ce.number
+        print(f"{ce.uri}: uri_summary_table[ce.uri]")
+
+
 
 
 if __name__ == "__main__":
