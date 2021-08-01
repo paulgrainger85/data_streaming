@@ -31,15 +31,15 @@ class TransformedStation(faust.Record):
 
 # TODO: Define a Faust Stream that ingests data from the Kafka Connect stations topic and
 #   places it into a new topic with only the necessary information.
-app = faust.App("stations-stream", broker="kafka://localhost:9092", store="memory://")
+app = faust.App("streaming-stations", broker="kafka://localhost:9092", store="memory://")
 # TODO: Define the input Kafka Topic. Hint: What topic did Kafka Connect output to?
-topic = app.topic("stations-todo", value_type=Station)
+topic = app.topic("connect-stations", value_type=Station)
 # TODO: Define the output Kafka Topic
-out_topic = app.topic("stations-transformed", partitions=1)
+out_topic = app.topic("org.chicago.cta.stations.table.v1", partitions=1)
 # TODO: Define a Faust Table
 table = app.Table(
    "transformed_station",
-   default=int,
+   default=TransformedStation,
    partitions=1,
    changelog_topic=out_topic,
 )
@@ -53,14 +53,25 @@ table = app.Table(
 #
 #
 @app.agent(topic)
-async def station_callback(station):
-    async for ce in station.group_by(ClickEvent.uri):
-        #
-        # TODO: Use the URI as key, and add the number for each click event
-        #
-        uri_summary_table[ce.uri] += ce.number
-        print(f"{ce.uri}: uri_summary_table[ce.uri]")
+async def station_callback(stations):
+    async for station in stations:
+        color = 'NULL'
 
+        if station.red is True:
+            color = 'red'
+        elif station.green is True:
+            color = 'green'
+        elif station.blue is True:
+            color = 'blue'
+        else:
+            color = 'NULL'    
+        table[station.station_id] = TransformedStation(
+            station_id = station.station_id,
+            station_name = station.station_name,
+            order = station.order,
+            line = color
+        )
+           
 
 
 

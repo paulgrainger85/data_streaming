@@ -66,6 +66,7 @@ def run_server():
             "org.chicago.cta.weather.v1",
             weather_model.process_message,
             offset_earliest=True,
+            is_avro=False,
         ),
         KafkaConsumer(
             "org.chicago.cta.stations.table.v1",

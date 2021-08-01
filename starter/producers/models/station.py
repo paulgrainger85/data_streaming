@@ -28,7 +28,7 @@ class Station(Producer):
             .replace("'", "")
         )
 
-        topic_name = f"station-{station_name}" # TODO: Come up with a better topic name
+        topic_name = f"org.chicago.cta.station.arrivals.{station_name}.v1" # TODO: Come up with a better topic name
         super().__init__(
             topic_name,
             key_schema=Station.key_schema,
@@ -48,21 +48,24 @@ class Station(Producer):
 
     def run(self, train, direction, prev_station_id, prev_direction):
         """Simulates train arrivals at this station"""
-        logger.info("arrival kafka integration incomplete - skipping")
+        logger.info(f"Producing message for {self.topic_name}")
         self.producer.produce(
            topic=self.topic_name,
            key={"timestamp": self.time_millis()},
-           value=json.dumps({
+           value={
               "station_id": self.station_id,
               "train_id": train.train_id,
               "direction": direction, 
               "prev_station_id": prev_station_id,
               "prev_direction": prev_direction,
-              "line": self.color,
-              "train_status": train.status,
-              }
-           )
+              "line": self.color.name.upper(),
+              "train_status": train.status.name,
+              },
+            key_schema = Station.key_schema,
+            value_schema = Station.value_schema,
         )
+        
+
 
     def __str__(self):
         return "Station | {:^5} | {:<30} | Direction A: | {:^5} | departing to {:<30} | Direction B: | {:^5} | departing to {:<30} | ".format(

@@ -31,7 +31,7 @@ class Weather(Producer):
 
     def __init__(self, month):
         super().__init__(
-            f"weather-{month}",
+            "org.chicago.cta.weather.v1",
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
             num_partitions=1,
@@ -72,23 +72,27 @@ class Weather(Producer):
         # specify the Avro schemas and verify that you are using the correct Content-Type header.
         #
         #
-        logger.info("weather kafka proxy integration incomplete - skipping")
         resp = requests.post(
-           f"{Weather.rest_proxy_url}/topics/weather-{month}",
+           f"{Weather.rest_proxy_url}/topics/org.chicago.cta.weather.v1",
            headers={"Content-Type": "application/vnd.kafka.avro.v2+json"},
-           data=json.dumps(
-               {
-                   "key_schema": Weather.key_schema,
-                   "value_schema": Weather.key_schema,
-                   "records": [{
-                       "temperature": self.temp,
-                       "status": self.status,
-                     },
-
-                 ]
-               }
-           ),
+            data=json.dumps(
+            {
+                "key_schema": json.dumps(Weather.key_schema),
+                "value_schema": json.dumps(Weather.value_schema),
+                "records": [
+                    {
+                        "key": {
+                            "timestamp": self.time_millis()
+                        },
+                        "value": {
+                                "temperature": self.temp,
+                                "status": self.status.name
+                        }
+                    }
+                ]
+            })
         )
+
         resp.raise_for_status()
 
         logger.debug(
