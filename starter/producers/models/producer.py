@@ -50,9 +50,7 @@ class Producer:
             except Exception as e:
                 logger.info(f"topic {self.topic_name} already exists")
             
-        # TODO: Configure the AvroProducer
         schema_registry = CachedSchemaRegistryClient({"url": SCHEMA_REGISTRY_URL})
-
 
         self.producer = AvroProducer(
             self.broker_properties,

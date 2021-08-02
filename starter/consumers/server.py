@@ -13,7 +13,7 @@ logging.config.fileConfig(f"{Path(__file__).parents[0]}/logging.ini")
 
 
 from consumer import KafkaConsumer
-from models import Lines, Weather
+from models import Line, Lines, Weather
 import topic_check
 
 
@@ -75,7 +75,7 @@ def run_server():
             is_avro=False,
         ),
         KafkaConsumer(
-            "^org.chicago.cta.station.arrivals.",
+            "^org.chicago.cta.station.arrivals.*",
             lines.process_message,
             offset_earliest=True,
         ),

@@ -21,13 +21,14 @@ class Lines:
         """Processes a station message"""
         if "org.chicago.cta.station" in message.topic():
             value = message.value()
-            if message.topic() == "org.chicago.cta.stations.table.v1":
+            if "org.chicago.cta.stations" in message.topic():
                 value = json.loads(value)
-            if value["line"] == "green":
+
+            if value["line"].lower() == "green":
                 self.green_line.process_message(message)
-            elif value["line"] == "red":
+            elif value["line"].lower() == "red":
                 self.red_line.process_message(message)
-            elif value["line"] == "blue":
+            elif value["line"].lower() == "blue":
                 self.blue_line.process_message(message)
             else:
                 logger.debug("discarding unknown line msg %s", value["line"])
@@ -35,5 +36,6 @@ class Lines:
             self.green_line.process_message(message)
             self.red_line.process_message(message)
             self.blue_line.process_message(message)
+
         else:
             logger.info("ignoring non-lines message %s", message.topic())
