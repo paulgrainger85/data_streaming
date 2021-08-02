@@ -13,7 +13,7 @@ logging.config.fileConfig(f"{Path(__file__).parents[0]}/logging.ini")
 
 
 from consumer import KafkaConsumer
-from models import Line, Lines, Weather
+from models import Lines, Weather
 import topic_check
 
 
